@@ -9,8 +9,10 @@ public class PlayerController : MonoBehaviour
     private GameObject focalPoint;
 
     public bool hasPowerup;
+    public bool hasPowerup2;
     private float powerupStrength = 10.0f;
     public GameObject powerupIndicator;
+    public GameObject powerup2Indicator;
 
     // Start is called before the first frame update
     void Start()
@@ -24,12 +26,13 @@ public class PlayerController : MonoBehaviour
     {
         MovePlayer();
         powerupIndicator.transform.position = transform.position + new Vector3(0, -0.5f, 0);
+        powerup2Indicator.transform.position = transform.position + new Vector3(0, -0.5f, 0);
     }
 
     void MovePlayer()
     {
         float verticalInput = Input.GetAxis("Vertical");
-        playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed);
+        playerRb.AddForce(speed * verticalInput * focalPoint.transform.forward);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -41,6 +44,13 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(nameof(PowerupCountdownRoutine));
             powerupIndicator.SetActive(true);
         }
+        if(other.CompareTag("Powerup2"))
+        {
+            hasPowerup2 = true;
+            Destroy(other.gameObject);
+            StartCoroutine(nameof(Powerup2CountdownRoutine));
+            powerup2Indicator.SetActive(true);
+        }
     }
 
     IEnumerator PowerupCountdownRoutine()
@@ -48,6 +58,12 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(7);
         hasPowerup = false;
         powerupIndicator.SetActive(false);
+    }
+    IEnumerator Powerup2CountdownRoutine()
+    {
+        yield return new WaitForSeconds(5);
+        hasPowerup2 = false;
+        powerup2Indicator.SetActive(false);
     }
     private void OnCollisionEnter(Collision collision)
     {
